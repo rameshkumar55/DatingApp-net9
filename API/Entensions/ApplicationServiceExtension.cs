@@ -1,4 +1,6 @@
 using API.Data;
+using API.Interfaces;
+using API.Services;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -23,7 +25,7 @@ public static class ApplicationServiceExtension
                       .AllowCredentials();
             });
         });
-
+        service.AddScoped<ITokenService, TokenService>();
 
         return service;
     }

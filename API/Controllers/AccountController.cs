@@ -52,7 +52,7 @@ namespace API.Controllers
             }           
             return new UserDto{
                 Username=user.UserName,
-                Token=tokenService.CreateToekn(user)
+                Token=tokenService.GenerateJwtToken(user)
             };
         }
 
