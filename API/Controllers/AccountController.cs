@@ -18,12 +18,24 @@ namespace API.Controllers
             {
                 return BadRequest("Username is already exists");
             }
+
+            if (await EmailExists(registerDto.Email))
+            {
+                return BadRequest("Email is already exists");
+            }
+
+            if (await MobileNumberExists(registerDto.MobileNumber))
+            {
+                return BadRequest("MobileNumber is already exists");
+            }
             using var hmac = new HMACSHA512();
             var user = new AppUser
             {
                 UserName = registerDto.UserName,
                 PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
-                PasswordSalt = hmac.Key
+                PasswordSalt = hmac.Key,
+                Email = registerDto.Email,
+                MobileNumber = registerDto.MobileNumber
             };
 
             dataContext.Users.Add(user);
@@ -36,7 +48,9 @@ namespace API.Controllers
         {
 
             var user = await dataContext.Users.FirstOrDefaultAsync(x =>
-            x.UserName.ToLower() == loginDto.UserName.ToLower().Trim());
+            x.UserName.ToLower() == loginDto.UserName.ToLower().Trim() || 
+            x.Email.ToLower() == loginDto.UserName.ToLower().Trim() || 
+            x.MobileNumber.ToLower() == loginDto.UserName.ToLower().Trim());
 
             if (user == null)
             {
@@ -59,6 +73,15 @@ namespace API.Controllers
         private async Task<bool> UserExists(string usename)
         {
             return await dataContext.Users.AnyAsync(u => u.UserName.ToLower() == usename.ToLower().Trim());
+        }
+         private async Task<bool> EmailExists(string email)
+        {
+            return await dataContext.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower().Trim());
+        }
+
+         private async Task<bool> MobileNumberExists(string mobile)
+        {
+            return await dataContext.Users.AnyAsync(u => u.MobileNumber.ToLower() == mobile.ToLower().Trim());
         }
     }
 }
